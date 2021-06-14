@@ -4,6 +4,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	"io"
+	"github.com/labstack/gommon/log"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -286,6 +287,7 @@ type Import struct {
 }
 
 func (i *Import) load(ws *Workspace, baseDir string) (err error) {
+	log.Info(baseDir)
 	if i.SchemaLocation != "" {
 		i.ImportedSchema, err =
 			ws.loadXsd(filepath.Join(baseDir, i.SchemaLocation), true)

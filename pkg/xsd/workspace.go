@@ -2,8 +2,13 @@ package xsd
 
 import (
 	"fmt"
+	"github.com/labstack/gommon/log"
+	"io/ioutil"
+	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 type Workspace struct {
@@ -22,14 +27,39 @@ func NewWorkspace(goModulesPath, xsdPath string) (*Workspace, error) {
 }
 
 func (ws *Workspace) loadXsd(xsdPath string, cache bool) (*Schema, error) {
+	fmt.Println("\n\n--> " + xsdPath)
 	cached, found := ws.Cache[xsdPath]
 	if found {
 		return cached, nil
 	}
-	fmt.Println("\tParsing:", xsdPath)
 
-	f, err := os.Open(xsdPath)
+	fmt.Println("\tParsing::", xsdPath)
+
+	var f *os.File
+	u := xsdPath
+	if strings.HasPrefix(xsdPath, `http`) {
+		xsdPath = strings.ReplaceAll(xsdPath , `http:/` , `http://`)
+		xsdPath = strings.ReplaceAll(xsdPath , `///` , `//`)
+		fmt.Println(`fetch ` + xsdPath)
+		resp, err := http.Get(xsdPath)
+		if err != nil {
+			panic(err)
+		}
+		b, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			panic(err)
+		}
+
+		dd := `/tmp/ddex/xxxx`
+		os.MkdirAll(dd, 0777)
+		fname := dd + `/` + filepath.Base(xsdPath)
+		ioutil.WriteFile(fname, b, 0777)
+		u = fname
+
+	}
+	f, err := os.Open(u)
 	if err != nil {
+		fmt.Println(`----------`)
 		return nil, err
 	}
 	defer f.Close()
@@ -47,8 +77,15 @@ func (ws *Workspace) loadXsd(xsdPath string, cache bool) (*Schema, error) {
 	}
 
 	dir := filepath.Dir(xsdPath)
+	if strings.HasPrefix(xsdPath , `http`) {
+		dir = ""
+	} else {
+		uu  , _ := url.Parse(xsdPath)
+		dir = "http://" + uu.Host
+	}
 
 	for idx, _ := range schema.Includes {
+		log.Info(`require...`)
 		si := schema.Includes[idx]
 		if err := si.load(ws, dir); err != nil {
 			return nil, err
@@ -68,6 +105,19 @@ func (ws *Workspace) loadXsd(xsdPath string, cache bool) (*Schema, error) {
 	}
 
 	for idx, _ := range schema.Imports {
+		x := schema.Imports[idx]
+		log.Info(x.SchemaLocation)
+		if !strings.HasPrefix(x.SchemaLocation, `http`) {
+			current , noUrlErr := url.Parse(xsdPath)
+			if noUrlErr == nil {
+				host := current.Host
+				pathDir := filepath.Dir(current.Path)
+				override := `http://` + host + pathDir + `/` + x.SchemaLocation
+				schema.Imports[idx].SchemaLocation = override
+			}
+
+		}
+
 		if err := schema.Imports[idx].load(ws, dir); err != nil {
 			return nil, err
 		}
