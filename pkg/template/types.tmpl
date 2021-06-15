@@ -14,15 +14,15 @@ import (
   type {{ .GoName }} struct {
     XMLName xml.Name `xml:"{{.Name}}"`
     {{ range .Attributes }}
-        {{ .GoName }} {{.GoForeignModule}}{{.GoType}} `xml:"{{.XmlName}},{{.Modifiers}}"`
+        {{ .GoName }} {{.GoForeignModule}}{{.GoType}} `xml:"{{.XmlName}},{{.Modifiers}},omitempty"`
     {{end }}
 
     {{ range .Elements }}
-      {{ .GoFieldName}} {{.GoMemLayout}}{{.GoForeignModule}}{{ .GoTypeName }} `xml:"{{.XmlName}}"`
+      {{ .GoFieldName}} {{.GoMemLayout}}{{.GoForeignModule}}{{ .GoTypeName }} `xml:"{{.XmlName}},omitempty"`
     {{ end }}
 
     {{- if .ContainsText }}
-      Text string `xml:",chardata"`
+      Text string `xml:",chardata,omitempty"`
     {{- end}}
   }
 
@@ -36,17 +36,17 @@ import (
     XMLName xml.Name
   {{- end}}
   {{ range .Attributes }}
-      {{ .GoName }} {{.GoForeignModule}}{{.GoType}} `xml:"{{.XmlName}},{{.Modifiers}}"`
+      {{ .GoName }} {{.GoForeignModule}}{{.GoType}} `xml:"{{.XmlName}},{{.Modifiers}},omitempty"`
   {{end }}
 
   {{ range .Elements }}
-    {{ .GoFieldName}} {{.GoMemLayout}}{{.GoForeignModule}}{{ .GoTypeName }} `xml:"{{.XmlName}}"`
+    {{ .GoFieldName}} {{.GoMemLayout}}{{.GoForeignModule}}{{ .GoTypeName }} `xml:"{{.XmlName}},omitempty"`
   {{end}}
 
   {{- if .ContainsText }}
-    Text string `xml:",chardata"`
+    Text string `xml:",chardata,omitempty"`
   {{- end}}
-  InnerXml string `xml:",innerxml"`
+  InnerXml string `xml:",innerxml,omitempty"`
   }
 {{end}}
 
