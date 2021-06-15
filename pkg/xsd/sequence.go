@@ -9,6 +9,7 @@ type Sequence struct {
 	ElementList []Element `xml:"element"`
 	Choices     []Choice  `xml:"choice"`
 	allElements []Element `xml:"-"`
+	Annotation Annotation `xml:"annotation"`
 }
 
 func (s *Sequence) Elements() []Element {

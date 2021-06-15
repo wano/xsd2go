@@ -18,6 +18,11 @@ type Attribute struct {
 	refAttr        *Attribute `xml:"-"`
 	typ            Type       `xml:"-"`
 	schema         *Schema    `xml:"-"`
+	Annotation Annotation `xml:"annotation"`
+}
+
+func (self *Attribute) Doc()string {
+	return self.Annotation.Doc()
 }
 
 // Public Go Name of this struct item

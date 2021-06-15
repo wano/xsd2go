@@ -24,6 +24,10 @@ type Element struct {
 	SimpleType      *SimpleType  `xml:"simpleType"`
 	schema          *Schema      `xml:"-"`
 	typ             Type         `xml:"-"`
+	Annotation Annotation `xml:"annotation"`
+}
+func (e *Element) Doc() string {
+	return e.Annotation.Doc()
 }
 
 func (e *Element) Attributes() []Attribute {

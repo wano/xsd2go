@@ -28,6 +28,7 @@ func NewWorkspace(goModulesPath, xsdPath string) (*Workspace, error) {
 
 func (ws *Workspace) loadXsd(xsdPath string, cache bool) (*Schema, error) {
 	fmt.Println("\n\n--> " + xsdPath)
+
 	cached, found := ws.Cache[xsdPath]
 	if found {
 		return cached, nil
@@ -38,8 +39,8 @@ func (ws *Workspace) loadXsd(xsdPath string, cache bool) (*Schema, error) {
 	var f *os.File
 	u := xsdPath
 	if strings.HasPrefix(xsdPath, `http`) {
-		xsdPath = strings.ReplaceAll(xsdPath , `http:/` , `http://`)
-		xsdPath = strings.ReplaceAll(xsdPath , `///` , `//`)
+		xsdPath = strings.ReplaceAll(xsdPath, `http:/`, `http://`)
+		xsdPath = strings.ReplaceAll(xsdPath, `///`, `//`)
 		fmt.Println(`fetch ` + xsdPath)
 		resp, err := http.Get(xsdPath)
 		if err != nil {
@@ -77,15 +78,15 @@ func (ws *Workspace) loadXsd(xsdPath string, cache bool) (*Schema, error) {
 	}
 
 	dir := filepath.Dir(xsdPath)
-	if strings.HasPrefix(xsdPath , `http`) {
+	if strings.HasPrefix(xsdPath, `http`) {
 		dir = ""
 	} else {
-		uu  , _ := url.Parse(xsdPath)
+		uu, _ := url.Parse(xsdPath)
 		dir = "http://" + uu.Host
 	}
 
+
 	for idx, _ := range schema.Includes {
-		log.Info(`require...`)
 		si := schema.Includes[idx]
 		if err := si.load(ws, dir); err != nil {
 			return nil, err
@@ -102,13 +103,14 @@ func (ws *Workspace) loadXsd(xsdPath string, cache bool) (*Schema, error) {
 		for key, sch := range isch.importedModules {
 			schema.importedModules[key] = sch
 		}
+
 	}
 
 	for idx, _ := range schema.Imports {
 		x := schema.Imports[idx]
 		log.Info(x.SchemaLocation)
 		if !strings.HasPrefix(x.SchemaLocation, `http`) {
-			current , noUrlErr := url.Parse(xsdPath)
+			current, noUrlErr := url.Parse(xsdPath)
 			if noUrlErr == nil {
 				host := current.Host
 				pathDir := filepath.Dir(current.Path)
@@ -122,6 +124,8 @@ func (ws *Workspace) loadXsd(xsdPath string, cache bool) (*Schema, error) {
 			return nil, err
 		}
 	}
+
+
 	schema.compile()
 	return schema, nil
 }

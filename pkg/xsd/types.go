@@ -2,6 +2,7 @@ package xsd
 
 import (
 	"encoding/xml"
+	"fmt"
 
 	"github.com/iancoleman/strcase"
 )
@@ -52,6 +53,11 @@ type ComplexType struct {
 	ComplexContent   *ComplexContent `xml:"complexContent"`
 	Choice           *Choice         `xml:"choice"`
 	content          GenericContent  `xml:"-"`
+	Annotation Annotation `xml:"annotation"`
+}
+
+func (self *ComplexType) Doc() string{
+	return self.Annotation.Doc()
 }
 
 func (ct *ComplexType) Attributes() []Attribute {
@@ -80,6 +86,14 @@ func (ct *ComplexType) Elements() []Element {
 	}
 	return []Element{}
 }
+
+func (ct *ComplexType) ChoiceState() string {
+	if ct.Choice == nil {
+		return ""
+	}
+	return fmt.Sprintf(`// min=%v max =%v ` , ct.Choice.MinOccurs , ct.Choice.MaxOccurs)
+}
+
 
 func (ct *ComplexType) GoName() string {
 	return strcase.ToCamel(ct.Name)
@@ -191,6 +205,13 @@ func (st *SimpleType) Enums() []Enumeration {
 	return []Enumeration{}
 }
 
+func (st *SimpleType) Patterns() []Pattern {
+	if st.Restriction != nil {
+		return st.Restriction.Patterns()
+	}
+	return []Pattern{}
+}
+
 func (st *SimpleType) ContainsText() bool {
 	return true
 }
@@ -242,8 +263,8 @@ var staticTypes = map[string]staticType{
 	"decimal":            "float64",
 	"boolean":            "bool",
 	"ID":                 "string",
-	"gYear" : "int",
-	"duration": "string",
+	"gYear":              "int",
+	"duration":           "string",
 }
 
 func StaticType(name string) staticType {

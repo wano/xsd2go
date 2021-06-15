@@ -12,6 +12,7 @@ type Choice struct {
 	Sequences   []Sequence `xml:"sequence"`
 	schema      *Schema    `xml:"-"`
 	allElements []Element  `xml:"-"`
+	Annotation Annotation `xml:"annotation"`
 }
 
 func (c *Choice) compile(sch *Schema, parentElement *Element) {

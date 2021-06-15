@@ -9,6 +9,7 @@ type Restriction struct {
 	Base             reference      `xml:"base,attr"`
 	AttributesDirect []Attribute    `xml:"attribute"`
 	EnumsDirect      []Enumeration  `xml:"enumeration"`
+	Pattern []Pattern `xml:"pattern"`
 	SimpleContent    *SimpleContent `xml:"simpleContent"`
 	schema           *Schema        `xml:"-"`
 	typ              Type
@@ -50,4 +51,8 @@ func (r *Restriction) Attributes() []Attribute {
 
 func (r *Restriction) Enums() []Enumeration {
 	return r.EnumsDirect
+}
+
+func (r *Restriction) Patterns() []Pattern {
+	return r.Pattern
 }

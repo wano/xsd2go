@@ -3,8 +3,8 @@ package xsd
 import (
 	"encoding/xml"
 	"fmt"
-	"io"
 	"github.com/labstack/gommon/log"
+	"io"
 	"path/filepath"
 	"sort"
 	"strings"
